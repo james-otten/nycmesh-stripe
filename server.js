@@ -22,7 +22,7 @@ function charge(req, res) {
       if (err)
         console.log("Error charging card: ", err)
       else
-        console.log(customer.email+' '+donationAmount);
+        console.log(charge.email+' '+donationAmount);
     });
   }
 
