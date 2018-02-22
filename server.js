@@ -13,36 +13,52 @@ function charge(req, res) {
 
   // subscription
   if (subscriptionPlan) {
-    const monthFromNow = parseInt(new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).getTime()/1000);
     stripe.customers.create(
       {
         source: stripeToken.id,
-        plan: subscriptionPlan,
         description: "NYC Mesh Donation",
-        email: stripeToken.email,
-        trial_end: monthFromNow
+        email: stripeToken.email
       },
       function(err, customer) {
         if (err) {
-          console.log("Error creating subscription: ", err);
-          return
+          console.log("Error creating customer: ", err);
+          return;
         }
-        console.log(customer.email + " subscribed to " + subscriptionPlan);
-        
-        stripe.invoiceItems.create({
-          amount: donationAmount,
-          currency: 'usd',
-          customer: customer.id,
-          description: 'Installation',
-        }, function(err, invoiceItem) {
-          console.log("Invoiced " + customer.email + " " + donationAmount)
-        });
+        console.log("Created customer: " + customer.email);
+
+        if (donationAmount) {
+          stripe.invoiceItems.create(
+            {
+              amount: donationAmount,
+              currency: "usd",
+              customer: customer.id,
+              description: "Installation"
+            },
+            function(err, invoiceItem) {
+              console.log(
+                "Invoiced " + customer.email + " " + donationAmount
+              );
+            }
+          );
+        }
+
+        stripe.subscriptions.create(
+          {
+            customer: customer.id,
+            items: [
+              {
+                plan: subscriptionPlan
+              }
+            ]
+          },
+          function(err, subscription) {
+            console.log("Subscribed " + customer.email + " to " + subscriptionPlan);
+          }
+        );
       }
     );
-  }
-
-  // one-time donation
-  else {
+  } else {
+    // one-time donation
     stripe.charges.create(
       {
         amount: donationAmount,
