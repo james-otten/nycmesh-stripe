@@ -68,7 +68,8 @@ function charge(req, res) {
   }
 }
 
-function subscribeCustomer(customer, plan, trialPeriod) {
+function subscribeCustomer(customer, plan, trialDays) {
+  const trial_end = parseInt(new Date(Date.now() + (trialDays * 24 * 60 * 60 * 1000)).getTime()/1000);
   stripe.subscriptions.create(
     {
       customer: customer.id,
@@ -77,7 +78,7 @@ function subscribeCustomer(customer, plan, trialPeriod) {
           plan
         }
       ],
-      trial_period_days: trialPeriod || 0
+      trial_end
     },
     function(err, subscription) {
       if (err) {
