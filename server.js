@@ -29,14 +29,13 @@ function charge(req, res) {
 
   // subscription
   if (subscriptionPlan) {
-    const monthFromNow = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000));
     stripe.customers.create(
       {
         source: stripeToken.id,
         plan: subscriptionPlan,
         description: "NYC Mesh Donation",
         email: stripeToken.email,
-        trial_end: monthFromNow
+        trial_period_days: 30
       },
       function(err, customer) {
         if (err) {
