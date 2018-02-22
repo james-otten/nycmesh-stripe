@@ -1,4 +1,4 @@
-var key = require("./key");
+var key = require("./key.json");
 var stripe = require("stripe")(key);
 
 var restify = require("restify");
@@ -29,13 +29,14 @@ function charge(req, res) {
 
   // subscription
   if (subscriptionPlan) {
+    const monthFromNow = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).getTime()/1000;
     stripe.customers.create(
       {
         source: stripeToken.id,
         plan: subscriptionPlan,
         description: "NYC Mesh Donation",
         email: stripeToken.email,
-        trial_period_days: 30
+        trial_end: monthFromNow
       },
       function(err, customer) {
         if (err) {
