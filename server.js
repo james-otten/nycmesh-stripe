@@ -29,7 +29,7 @@ function charge(req, res) {
 
   // subscription
   if (subscriptionPlan) {
-    const monthFromNow = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).getTime()/1000;
+    const monthFromNow = parseInt(new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).getTime()/1000);
     stripe.customers.create(
       {
         source: stripeToken.id,
