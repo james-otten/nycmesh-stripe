@@ -1,4 +1,4 @@
-var key = require("./key.json");
+var key = require("./key");
 var stripe = require("stripe")(key);
 
 var restify = require("restify");
