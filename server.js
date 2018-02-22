@@ -11,7 +11,8 @@ function charge(req, res) {
   var donationAmount = req.params.donationAmount;
   var subscriptionPlan = req.params.subscriptionPlan;
 
-  // subscription
+  // If subscription selected, invoice customer
+  // then add them to plan with 30 day trial
   if (subscriptionPlan) {
     stripe.customers.create(
       {
@@ -22,29 +23,31 @@ function charge(req, res) {
       function(err, customer) {
         if (err) {
           console.log("Error creating customer: ", err);
+          res.send(400);
           return;
         }
         console.log("Created customer: " + customer.email);
-
-        if (donationAmount) {
-          stripe.invoiceItems.create(
-            {
-              amount: donationAmount,
-              currency: "usd",
-              customer: customer.id,
-              description: "Installation"
-            },
-            function(err, invoiceItem) {
-              console.log("Invoiced " + customer.email + " " + donationAmount);
-              subscribeCustomer(customer, subscriptionPlan)
+        stripe.invoiceItems.create(
+          {
+            amount: donationAmount,
+            currency: "usd",
+            customer: customer.id,
+            description: "Installation"
+          },
+          function(err, invoiceItem) {
+            if (err) {
+              console.log("Error invoicing customer: ", err);
+              res.send(400);
+              return;
             }
-          );
-        } else {
-          subscribeCustomer(customer, subscriptionPlan)
-        }
+            console.log("Invoiced " + customer.email + " " + donationAmount);
+            subscribeCustomer(customer, subscriptionPlan, 30);
+          }
+        );
       }
     );
   } else {
+    // Otherwise just make the one time charge
     // one-time donation
     stripe.charges.create(
       {
@@ -54,14 +57,18 @@ function charge(req, res) {
         description: "NYC Mesh Donation"
       },
       function(err, charge) {
-        if (err) console.log("Error charging card: ", err);
-        else console.log("Charged" + charge.email + " " + donationAmount);
+        if (err) {
+          console.log("Error charging card: ", err);
+          res.send(400, "Error charging card");
+        } else {
+          console.log("Charged" + charge.email + " " + donationAmount);
+        }
       }
     );
   }
 }
 
-function subscribeCustomer(customer, plan) {
+function subscribeCustomer(customer, plan, trialPeriod) {
   stripe.subscriptions.create(
     {
       customer: customer.id,
@@ -69,9 +76,15 @@ function subscribeCustomer(customer, plan) {
         {
           plan
         }
-      ]
+      ],
+      trial_period_days: trialPeriod || 0
     },
     function(err, subscription) {
+      if (err) {
+        console.log("Error subscribing " + customer.email, err);
+        return;
+      }
+
       console.log("Subscribed " + customer.email + " to " + plan);
     }
   );
