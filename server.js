@@ -11,22 +11,6 @@ function charge(req, res) {
   var donationAmount = req.params.donationAmount;
   var subscriptionPlan = req.params.subscriptionPlan;
 
-  // one-time donation
-  if (parseInt(donationAmount)) {
-    stripe.charges.create(
-      {
-        amount: donationAmount,
-        currency: "usd",
-        source: stripeToken.id,
-        description: "NYC Mesh Donation"
-      },
-      function(err, charge) {
-        if (err) console.log("Error charging card: ", err);
-        else console.log("Charged" + charge.email + " " + donationAmount);
-      }
-    );
-  }
-
   // subscription
   if (subscriptionPlan) {
     const monthFromNow = parseInt(new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).getTime()/1000);
@@ -41,9 +25,34 @@ function charge(req, res) {
       function(err, customer) {
         if (err) {
           console.log("Error creating subscription: ", err);
-          console.log(customer)
+          return
         }
-        else console.log(customer.email + " " + subscriptionPlan);
+        console.log(customer.email + " subscribed to " + subscriptionPlan);
+        
+        stripe.invoiceItems.create({
+          amount: donationAmount,
+          currency: 'usd',
+          customer: customer.id,
+          description: 'Installation',
+        }, function(err, invoiceItem) {
+          console.log("Invoiced " + customer.email + " " + donationAmount)
+        });
+      }
+    );
+  }
+
+  // one-time donation
+  else {
+    stripe.charges.create(
+      {
+        amount: donationAmount,
+        currency: "usd",
+        source: stripeToken.id,
+        description: "NYC Mesh Donation"
+      },
+      function(err, charge) {
+        if (err) console.log("Error charging card: ", err);
+        else console.log("Charged" + charge.email + " " + donationAmount);
       }
     );
   }
