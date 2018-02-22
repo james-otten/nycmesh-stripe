@@ -61,7 +61,7 @@ function charge(req, res) {
           console.log("Error charging card: ", err);
           res.send(400, "Error charging card");
         } else {
-          console.log("Charged" + charge.email + " " + donationAmount);
+          console.log("Charged " + charge.receipt_email + " " + donationAmount);
         }
       }
     );
