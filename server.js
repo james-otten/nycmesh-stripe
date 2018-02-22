@@ -35,26 +35,13 @@ function charge(req, res) {
               description: "Installation"
             },
             function(err, invoiceItem) {
-              console.log(
-                "Invoiced " + customer.email + " " + donationAmount
-              );
+              console.log("Invoiced " + customer.email + " " + donationAmount);
+              subscribeCustomer(customer, subscriptionPlan)
             }
           );
+        } else {
+          subscribeCustomer(customer, subscriptionPlan)
         }
-
-        stripe.subscriptions.create(
-          {
-            customer: customer.id,
-            items: [
-              {
-                plan: subscriptionPlan
-              }
-            ]
-          },
-          function(err, subscription) {
-            console.log("Subscribed " + customer.email + " to " + subscriptionPlan);
-          }
-        );
       }
     );
   } else {
@@ -72,6 +59,22 @@ function charge(req, res) {
       }
     );
   }
+}
+
+function subscribeCustomer(customer, plan) {
+  stripe.subscriptions.create(
+    {
+      customer: customer.id,
+      items: [
+        {
+          plan
+        }
+      ]
+    },
+    function(err, subscription) {
+      console.log("Subscribed " + customer.email + " to " + plan);
+    }
+  );
 }
 
 var server = restify.createServer();
