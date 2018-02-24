@@ -1,2 +1,4 @@
 node_modules
 key.json
+key.js
+yarn.lock
