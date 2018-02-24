@@ -3,7 +3,10 @@ var stripe = require("stripe")(key);
 var restify = require("restify");
 
 function donate(req, res) {
-  if (!req.params || !req.params.stripeToken) return;
+  if (!req.params || !req.params.stripeToken) {
+    res.end(400, "No token")
+    return;
+  }
 
   // should really sanitize input
   var stripeToken = req.params.stripeToken;
@@ -15,10 +18,12 @@ function donate(req, res) {
     createCharge(stripeToken, donationAmount, (err, charge) => {
       if (err) {
         console.log("Error charging card: ", err);
-        res.send(400, "Error charging card");
+        res.writeHead(400);
+        res.end("Error charging card");
       } else {
         console.log("Charged " + charge.receipt_email + " " + donationAmount);
-        res.end(200);
+        res.writeHead(200);
+        res.end();
       }
     });
   }
@@ -28,10 +33,12 @@ function donate(req, res) {
     createSubscription(stripeToken, subscriptionPlan, (err, charge) => {
       if (err) {
         console.log("Error creating subscription: ", err);
-        res.send(400, "Error creating subscription");
+        res.writeHead(400);
+        res.end("Error creating subscription");
       } else {
         console.log("Subscribed " + charge.receipt_email + " to " + subscriptionPlan);
-        res.end(200);
+        res.writeHead(200);
+        res.end();
       }
     })
   }
@@ -77,7 +84,8 @@ function charge(req, res) {
       function(err, customer) {
         if (err) {
           console.log("Error creating customer: ", err);
-          res.send(400);
+          res.writeHead(400);
+          res.end("Error creating customer");
           return;
         }
         console.log("Created customer: " + customer.email);
@@ -91,7 +99,8 @@ function charge(req, res) {
           function(err, invoiceItem) {
             if (err) {
               console.log("Error invoicing customer: ", err);
-              res.send(400);
+              res.writeHead(400);
+              res.end("Error invoicing customer");
               return;
             }
             console.log("Invoiced " + customer.email + " " + donationAmount);
@@ -113,7 +122,8 @@ function charge(req, res) {
       function(err, charge) {
         if (err) {
           console.log("Error charging card: ", err);
-          res.send(400, "Error charging card");
+          res.writeHead(400);
+          res.end("Error charging card");
         } else {
           console.log("Charged " + charge.receipt_email + " " + donationAmount);
         }
