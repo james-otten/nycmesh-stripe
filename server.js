@@ -16,7 +16,7 @@ function charge(req, res, next) {
     stripe.customers.create(
       {
         source: stripeToken.id,
-        description: "NYC Mesh Donation",
+        description: stripeToken.email,
         email: stripeToken.email
       },
       function(err, customer) {
@@ -90,7 +90,7 @@ function createSubscription(stripeToken, subscriptionPlan, cb) {
   const customer = {
     source: stripeToken.id,
     plan: subscriptionPlan,
-    description: "NYC Mesh Donation",
+    description: stripeToken.email,
     email: stripeToken.email
   };
   stripe.customers.create(customer, cb);
