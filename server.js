@@ -191,7 +191,7 @@ var server = restify.createServer();
 
 server.use(restify.bodyParser());
 server.use(function crossOrigin(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://nycmesh.net");
+  res.header("Access-Control-Allow-Origin", "https://www.nycmesh.net");
   return next();
 });
 
