@@ -167,7 +167,7 @@ function donate(req, res, next) {
       {
         source: stripeToken.id,
         plan: donationAmount,
-        description: "NYC Mesh Donation",
+        description: stripeToken.email,
         email: stripeToken.email
       },
       function(err, customer) {
