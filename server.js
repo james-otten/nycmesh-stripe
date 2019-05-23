@@ -57,7 +57,7 @@ function charge(req, res, next) {
         amount: donationAmount,
         currency: "usd",
         source: stripeToken.id,
-        description: "NYC Mesh Donation"
+        description: "Installation"
       },
       function(err, charge) {
         if (err) {
@@ -139,7 +139,7 @@ function donate(req, res, next) {
         amount: donationAmount,
         currency: "usd",
         source: stripeToken.id,
-        description: "NYC Mesh Donation",
+        description: "Donation",
         receipt_email: stripeToken.email
       },
       function(err, charge) {
