@@ -158,6 +158,7 @@ function donate(req, res, next) {
     );
   } else if (
     donationAmount == "twenty-monthly" ||
+    donationAmount == "thirty-monthly" ||
     donationAmount == "fifty-monthly" ||
     donationAmount == "hundred-monthly"
   ) {
