@@ -8,7 +8,7 @@ function charge(req, res, next) {
   // should really sanitize input
   var stripeToken = req.params.stripeToken;
   var donationAmount = req.params.donationAmount;
-  var subscriptionPlan = req.params.subscriptionPlan === "thirty-monthly" ? "plan_FN3hkJAGUgYKpX" : req.params.subscriptionPlan;
+  var subscriptionPlan = req.params.subscriptionPlan;
 
   // If subscription selected, invoice customer
   // then add them to plan with 30 day trial
@@ -158,13 +158,13 @@ function donate(req, res, next) {
     );
   } else if (
     donationAmount == "twenty-monthly" ||
-    donationAmount == "thirty-monthly" ||
+    donationAmount == "plan_FN3hkJAGUgYKpX" || //30
     donationAmount == "fifty-monthly" ||
     donationAmount == "hundred-monthly"
   ) {
     // subscription
     // Hacky fix
-    var plan = donationAmount === "thirty-monthly" ? "plan_FN3hkJAGUgYKpX" : req.params.plan;
+    var plan = req.params.plan;
     stripe.customers.create(
       {
         source: stripeToken.id,
