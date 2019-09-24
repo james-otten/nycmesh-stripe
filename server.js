@@ -8,7 +8,7 @@ function charge(req, res, next) {
   // should really sanitize input
   var stripeToken = req.params.stripeToken;
   var donationAmount = req.params.donationAmount;
-  var subscriptionPlan = req.params.subscriptionPlan;
+  var subscriptionPlan = req.params.subscriptionPlan === "thirty-monthly" ? "plan_FN3hkJAGUgYKpX" : req.params.subscriptionPlan;
 
   // If subscription selected, invoice customer
   // then add them to plan with 30 day trial
@@ -163,7 +163,8 @@ function donate(req, res, next) {
     donationAmount == "hundred-monthly"
   ) {
     // subscription
-    var plan = req.params.plan;
+    // Hacky fix
+    var plan = donationAmount === "thirty-monthly" ? "plan_FN3hkJAGUgYKpX" : req.params.plan;
     stripe.customers.create(
       {
         source: stripeToken.id,
