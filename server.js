@@ -57,7 +57,8 @@ function charge(req, res, next) {
         amount: donationAmount,
         currency: "usd",
         source: stripeToken.id,
-        description: "Installation"
+        description: "Installation",
+        receipt_email: stripeToken.email
       },
       function(err, charge) {
         if (err) {
